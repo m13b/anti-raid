@@ -17,6 +17,8 @@ module.exports = {
         //ban function
         msg.guild.members.ban(userid).then(user => {
           resultsarray.push("Success: " +userid +"\n")
+
+          //if last ID, send message indidicating results
           if(userid == idarray[(idarray.length)-1]){
             msg.channel.send("Ban results: \n" +resultsarray, {split: true}).then(msg =>{
               console.log("Successfully sent results")

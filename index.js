@@ -21,6 +21,7 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag} in servers:`);
   client.guilds.cache.each(guild => {
     console.log(guild.name +" : " +guild.id)
+    //adds guild to recentJoin array for user join tracking
     recentJoin.push({'id': guild.id, 'uids': uids=[]})
   })
 });
@@ -57,13 +58,12 @@ client.on('guildMemberAdd', member => {
   const notif_obj = notifications.find(element => element.server_id == gid)
 
   //pushes new member details object to guild specific array. Removes first object in array if length = 3
-  if(recent_obj.uids.length <3){
-    recent_obj.uids.push({"id": member.id, "date": cd})
-  }
-  else{
+  if(recent_obj.uids.length == 3){
     recent_obj.uids.shift()
-    recent_obj.uids.push({"id": member.id, "date": cd})
   }
+  
+  recent_obj.uids.push({"id": member.id, "date": cd})
+  
   
   //Checks if recent 3 joins have the same create date. If date is same, mentions Mod role and provides UIDs + date.
   if(recent_obj.uids.length == 3){
@@ -76,6 +76,8 @@ client.on('guildMemberAdd', member => {
       })
     }
   }
+
+  console.log(recent_obj)
 })
 
 client.login(token);
