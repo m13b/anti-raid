@@ -13,16 +13,16 @@ for (const file of commandFiles) {
 }
 
 //globals
-var recentJoin = []
-const {prefix, token} = config
+let recentJoin = []
+const {prefix, token, notifications} = config
 
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag} in servers:`);
   client.guilds.cache.each(guild => {
     console.log(guild.name +" : " +guild.id)
+    recentJoin.push({'id': guild.id, 'uids': uids=[]})
   })
-
 });
 
 //new message handler
@@ -46,22 +46,36 @@ client.on('message', msg => {
 //member join event handler
 client.on('guildMemberAdd', member => {
 
-  let date = member.user.createdAt
-  let cd = `${date.getDate()}${date.getMonth()}${date.getFullYear()}`
-  if(recentJoin.length <3){
-    recentJoin.push({"id": member.id, "date": cd})
+  
+  const date = member.user.createdAt
+  const cd = `${date.getDate()}${date.getMonth()}${date.getFullYear()}`
+  const gid = member.guild.id
+
+  //finds array specific to guild join in recentJoins
+  const position = recentJoin.findIndex(element => element.id == gid)
+
+  //gets details to send notifications
+  const notif_pos = notifications.findIndex(element => element.server_id = gid)
+
+  const notification_channel = notifications[notif_pos].channel_id
+  const notification_role = notifications[notif_pos].role_id
+
+  //pushes new member details object to guild specific array. Removes first object in array if length = 3
+  if(recentJoin[position].uids.length <3){
+    recentJoin[position].uids.push({"id": member.id, "date": cd})
   }
   else{
-    recentJoin.shift()
-    recentJoin.push({"id": member.id, "date": cd})
+    recentJoin[position].uids.shift()
+    recentJoin[position].uids.push({"id": member.id, "date": cd})
   }
 
-  console.log(recentJoin)
-
-  if(recentJoin.length == 3){
-    if(recentJoin[0].date == recentJoin[1].date == recentJoin[2].date){
-      client.channels.fetch("309439259448967168").then(chan =>{
-        chan.send(`3 users with the same create date have joined in succession. User IDs: \n ${recentJoin[0].id} \n${recentJoin[1].id} \n${recentJoin[2].id} \n Create date: ${date} <@&288153870801043458>`)
+  console.log(recentJoin[position])
+  
+  //Checks if recent 3 joins have the same create date. If date is same, mentions Mod role and provides UIDs + date.
+  if(recentJoin[position].uids.length == 3){
+    if(recentJoin[position].uids[0].date == recentJoin[position].uids[1].date == recentJoin[position].uids[2].date){
+      client.channels.fetch(notification_channel).then(chan =>{
+        chan.send(`3 users with the same create date have joined in succession. User IDs: \n ${recentJoin[position].uids[0].id} \n${recentJoin[position].uids[1].id} \n${recentJoin[position].uids[2].id} \n Create date: ${date} <@&${notification_role}>`)
       }).catch(err =>{
         console.log("Unable to send to channel")
         console.log(err)
