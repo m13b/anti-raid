@@ -46,36 +46,30 @@ client.on('message', msg => {
 //member join event handler
 client.on('guildMemberAdd', member => {
 
-  
   const date = member.user.createdAt
   const cd = `${date.getDate()}${date.getMonth()}${date.getFullYear()}`
   const gid = member.guild.id
 
-  //finds array specific to guild join in recentJoins
-  const position = recentJoin.findIndex(element => element.id == gid)
+  //finds server specific recentJoin array
+  const recent_obj = recentJoin.find(element => element.id == gid)
 
-  //gets details to send notifications
-  const notif_pos = notifications.findIndex(element => element.server_id = gid)
-
-  const notification_channel = notifications[notif_pos].channel_id
-  const notification_role = notifications[notif_pos].role_id
+  //gets server specific details to send notifications
+  const notif_obj = notifications.find(element => element.server_id == gid)
 
   //pushes new member details object to guild specific array. Removes first object in array if length = 3
-  if(recentJoin[position].uids.length <3){
-    recentJoin[position].uids.push({"id": member.id, "date": cd})
+  if(recent_obj.uids.length <3){
+    recent_obj.uids.push({"id": member.id, "date": cd})
   }
   else{
-    recentJoin[position].uids.shift()
-    recentJoin[position].uids.push({"id": member.id, "date": cd})
+    recent_obj.uids.shift()
+    recent_obj.uids.push({"id": member.id, "date": cd})
   }
-
-  console.log(recentJoin[position])
   
   //Checks if recent 3 joins have the same create date. If date is same, mentions Mod role and provides UIDs + date.
-  if(recentJoin[position].uids.length == 3){
-    if(recentJoin[position].uids[0].date == recentJoin[position].uids[1].date == recentJoin[position].uids[2].date){
-      client.channels.fetch(notification_channel).then(chan =>{
-        chan.send(`3 users with the same create date have joined in succession. User IDs: \n ${recentJoin[position].uids[0].id} \n${recentJoin[position].uids[1].id} \n${recentJoin[position].uids[2].id} \n Create date: ${date} <@&${notification_role}>`)
+  if(recent_obj.uids.length == 3){
+    if(recent_obj.uids[0].date == recent_obj.uids[1].date == recent_obj.uids[2].date){
+      client.channels.fetch(notif_obj.notification_channel).then(chan =>{
+        chan.send(`3 users with the same create date have joined in succession. User IDs: \n ${recent_obj.uids[0].id} \n${recent_obj.uids[1].id} \n${recent_obj.uids[2].id} \n Create date: ${date} <@&${notif_obj.notification_role}>`)
       }).catch(err =>{
         console.log("Unable to send to channel")
         console.log(err)
