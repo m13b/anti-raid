@@ -11,7 +11,7 @@ module.exports = {
         })
         
         //array for holding results
-        let resultsarray=[]
+        var resultsarray=[]
 
         idarray.forEach(userid => {
 
