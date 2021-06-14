@@ -67,6 +67,7 @@ client.on('guildMemberAdd', member => {
   if(recent_obj.uids.length == 3){
     if(recent_obj.uids[0].date == recent_obj.uids[1].date && recent_obj.uids[0].date == recent_obj.uids[2].date && recent_obj.uids[0].id != recent_obj.uids[2].id){
       client.channels.fetch(notif_obj.channel_id).then(chan =>{
+        //Note: notification can mention role ID only. No user IDs atm
         chan.send(`3 users with the same create date have joined in succession. \nUser IDs: \n${recent_obj.uids[0].id} \n${recent_obj.uids[1].id} \n${recent_obj.uids[2].id} \nCreate date: ${date} <@&${notif_obj.role_id}>`)
       }).catch(err =>{
         console.log("Unable to send to channel")
