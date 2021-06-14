@@ -16,7 +16,6 @@ for (const file of commandFiles) {
 let recentJoin = []
 const {prefix, token, notifications} = config
 
-
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag} in servers:`);
   client.guilds.cache.each(guild => {
@@ -46,7 +45,6 @@ client.on('message', msg => {
 
 //member join event handler
 client.on('guildMemberAdd', member => {
-
   const date = member.user.createdAt
   const cd = `${date.getDate()}${date.getMonth()}${date.getFullYear()}`
   const gid = member.guild.id
@@ -67,9 +65,9 @@ client.on('guildMemberAdd', member => {
   
   //Checks if recent 3 joins have the same create date. If date is same, mentions Mod role and provides UIDs + date.
   if(recent_obj.uids.length == 3){
-    if(recent_obj.uids[0].date == recent_obj.uids[1].date == recent_obj.uids[2].date){
-      client.channels.fetch(notif_obj.notification_channel).then(chan =>{
-        chan.send(`3 users with the same create date have joined in succession. User IDs: \n ${recent_obj.uids[0].id} \n${recent_obj.uids[1].id} \n${recent_obj.uids[2].id} \n Create date: ${date} <@&${notif_obj.notification_role}>`)
+    if(recent_obj.uids[0].date == recent_obj.uids[1].date && recent_obj.uids[0].date == recent_obj.uids[2].date && recent_obj.uids[0].id != recent_obj.uids[2].id){
+      client.channels.fetch(notif_obj.channel_id).then(chan =>{
+        chan.send(`3 users with the same create date have joined in succession. \nUser IDs: \n${recent_obj.uids[0].id} \n${recent_obj.uids[1].id} \n${recent_obj.uids[2].id} \nCreate date: ${date} <@&${notif_obj.role_id}>`)
       }).catch(err =>{
         console.log("Unable to send to channel")
         console.log(err)
@@ -77,7 +75,7 @@ client.on('guildMemberAdd', member => {
     }
   }
 
-  console.log(recent_obj)
+  console.log(recent_obj.uids)
 })
 
 client.login(token);
